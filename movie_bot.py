@@ -95,6 +95,12 @@ async def start(update: Update, context) -> None:
     except Exception:
         await update.message.reply_html(welcome_text)
 
+async def popular_command(update: Update, context) -> None:
+    await show_trending(update)
+
+async def genres_command(update: Update, context) -> None:
+    await get_genres(update, context)
+
 async def handle_message(update: Update, context) -> None:
     query = update.message.text.lower().strip()
     
@@ -193,12 +199,12 @@ async def callback_handler(update: Update, context):
                 await send_media_details(update, movie, "movie")
 
 def main():
-    # Start the dummy web server in a separate thread
     threading.Thread(target=run_flask, daemon=True).start()
     
-    # Start the Telegram Bot
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("popular", popular_command))
+    app.add_handler(CommandHandler("genres", genres_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.run_polling()
