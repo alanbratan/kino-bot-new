@@ -25,8 +25,8 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-# Credentials
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8759231792:AAEehZMCA8LZIRTNhkiN_PxWL0P9U0QVQjg")
+# Credentials (SECURE: Getting from Environment Variables)
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TMDB_API_KEY = os.environ.get("TMDB_API_KEY", "2735fa30231a3de0106b13ddd26c1226")
 
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
@@ -201,6 +201,10 @@ async def callback_handler(update: Update, context):
 def main():
     threading.Thread(target=run_flask, daemon=True).start()
     
+    if not TELEGRAM_BOT_TOKEN:
+        logger.error("TELEGRAM_BOT_TOKEN not found in environment variables!")
+        return
+
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("popular", popular_command))
